@@ -1,0 +1,105 @@
+
+API Documentation
+
+HTTP APIs
+----------
+
+1. User Registration/Login
+   - URL: http://localhost:4003/api/auth
+   - Method: POST
+   - Description:
+       This endpoint is used for user registration or login.
+       - If the user already exists in the database, it returns status code 200.
+       - If the user does not exist, it creates the user, returns status code 201, and generates a token.
+
+   - Request Body:
+       - `username` (string): The username of the user.
+       - `password` (string): The user's password.
+
+   - Response:
+       - Status Code: 
+           - 200: User exists.
+           - 201: User created successfully.
+       - Body:
+           - `token` (string): A token generated for the authenticated/registered user.
+
+---
+
+2. Get User Information
+   - URL: http://localhost:4003/api/auth/me
+   - Method: GET
+   - Description:
+       This endpoint retrieves user information based on the provided token in the headers.
+
+   - Headers:
+       - `Authorization`: Bearer <token>
+
+   - Response:
+       - Status Code:
+           - 200: Token is valid, and user information is returned.
+       - Body:
+           - `user` (object): An object containing the user information (e.g., `id`, `username`, `email`, etc.).
+
+---
+
+Socket APIs
+------------
+
+1. Establishing a Connection
+   - URL: http://localhost:4003
+   - Description:
+       This establishes a WebSocket connection with the server to enable real-time interactions.
+
+   - Event: `privateChats`
+       - Description: 
+           After the connection is established, this event is used to retrieve all private chats of the user.
+       - Response: 
+           - An array containing details of all private chats and user information.
+
+---
+
+2. Modifying Private Chats
+   - URL: http://localhost:4003/pvs
+   - Description:
+       This WebSocket endpoint handles various events for modifying and interacting with private chats.
+
+   - Events:
+     - **joining**
+       - Description: 
+           Triggered when a user joins a chat.
+       - Data Sent:
+           - `sender` (string): The sender's user ID or name.
+           - `receiver` (string): The receiver's user ID or name.
+
+     - **newMsg**
+       - Description: 
+           Used to send a new message in a chat.
+       - Data Sent:
+           - `message` (string): The message text.
+           - `sender` (string): The sender's user ID or name.
+           - `receiver` (string): The receiver's user ID or name.
+
+     - **confirmMsg**
+       - Description: 
+           Triggered to confirm receipt of new messages.
+       - Usage:
+           This is handled with the `.on()` method on the client side to retrieve newly sent messages.
+
+     - **removeMsg**
+       - Description: 
+           Used to delete a specific message.
+       - Data Sent:
+           - `messageId` (string): The ID of the message to delete.
+
+     - **confirmRemoveMsg**
+       - Description:
+           Confirms the removal of a message.
+       - Response:
+           - `messageId` (string): The ID of the removed message, which the client uses to update the UI and messages Array.
+
+---
+
+Notes:
+- Always ensure token security in headers and WebSocket communication.
+- Use HTTPS in production to secure all API interactions.
+- Handle WebSocket events with appropriate error handling and validations for better reliability.
